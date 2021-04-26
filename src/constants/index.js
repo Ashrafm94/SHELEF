@@ -13,4 +13,4 @@ export const DUMMY_DATA = [
 ];
 
 export const IN_ACTIVE_ITEM_SIZE = 100;
-export const ACTIVE_ITEM_SIZE = 100;
+export const ACTIVE_ITEM_SIZE = 200;
