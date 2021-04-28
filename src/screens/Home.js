@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, SafeAreaView, Animated } from 'react-native';
+import { View, SafeAreaView, Animated, Easing } from 'react-native';
 import Cart from '../components/Cart';
 import FlatListComponent from '../components/FlatListComponent';
 
@@ -10,11 +10,12 @@ const Home = () => {
 
     const [isCartOpen, setCartOpen] = useState(false);
     const flexAnimatedVal = useRef(new Animated.Value(CART_CLOSED_FLEX)).current;
+    
 
     const changeLayoutHeightAndToggleCart = () => {
 
         let newVal = isCartOpen ? CART_CLOSED_FLEX : CART_OPEN_FLEX;
-        let timeOut = isCartOpen ? 490 : 1;
+        let timeOut = isCartOpen ? 501 : 1;
 
         setTimeout(() => {
             setCartOpen(!isCartOpen);
@@ -27,12 +28,14 @@ const Home = () => {
         Animated.timing(flexAnimatedVal, {
             toValue: val,
             duration: 500,
-            useNativeDriver: false
+            useNativeDriver: false,
+            easing: Easing.inOut(Easing.linear),
+            delay: 1
         }).start();
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
             <View style={{ flex: 1 }}>
 
                 <Animated.View style={{

@@ -1,3 +1,5 @@
+import { Dimensions } from 'react-native'
+
 const img1 = require('../assets/images/1.png')
 const img2 = require('../assets/images/2.png')
 const img3 = require('../assets/images/3.png')
@@ -21,3 +23,6 @@ export const DUMMY_DATA = [
  {id: 14, img: img4, price: 13.2},
  {id: 15, img: img5, price: 12.5}
 ];
+
+//export const ITEM_SIZE = 140;
+export const ITEM_SIZE = Dimensions.get("window").width;

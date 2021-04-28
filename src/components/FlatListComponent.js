@@ -1,11 +1,9 @@
 import React, { useRef } from 'react';
-import { Animated, Dimensions } from 'react-native';
+import {Animated } from 'react-native';
 import FlatListItem from './FlatListItem';
 import { useDispatch, useSelector } from 'react-redux';
-import { DUMMY_DATA } from '../constants';
-import { addItem, modifyItem } from '../redux/actions/cart';
-
-const { width } = Dimensions.get("window");
+import { DUMMY_DATA, ITEM_SIZE } from '../constants';
+import { addItem, emptyCart, modifyItem, removeItem } from '../redux/actions/cart';
 
 const FlatListComponent = () => {
 
@@ -13,45 +11,81 @@ const FlatListComponent = () => {
     const cart = useSelector(state => state.cartReducer.cart);
     const dispatch = useDispatch();
 
-    //TODO: INCOMPLETE
-    const addToCart = (item) => {
-        //IF ITEM EXIST
-        //INCRESE THE AMOUTN
-        //OTHERWISE
-        //ADD IT
+    const getItemFromCart = (item) => {
+        let itemArray = cart.filter((val) => val.id === item.id);
+        return itemArray.length === 0 ? null : itemArray[0];
+    }
 
-        let itemExist = cart.filter((val) => val.id === item.id);
+    //Add Item
+    const addToCart = (item) => {
+        
+        let oldItem = getItemFromCart(item);
 
         //Item Exist
-        if (itemExist.length > 0) {
-            dispatch(modifyItem(item));
+        if (oldItem) {
+             modifyItem({
+                ...item,
+                qty: oldItem.qty + 1
+            });
         } else {
             //Add New Item
-            dispatch(addItem(item));
+            dispatch(addItem({
+                ...item,
+                qty: 1
+            }));
         }
     }
 
+    //Remove Item
+    const removeFromCart = (item) => {
+        let oldItem = getItemFromCart(item);
+
+        if (oldItem) {
+            if (oldItem.qty > 1) {
+                modifyItem({
+                    ...item,
+                    qty: oldItem.qty - 1
+                });
+            } else {
+                dispatch(removeItem(oldItem.id));
+            }
+        }
+    }
+
+    //Modify Item
+    const modifyItem = (item) => {
+        dispatch(modifyItem(item));
+    }
+
+    const getQty = (item) => {
+        let oldItem = getItemFromCart(item);
+        return oldItem ? oldItem.qty : 0
+    }
+
     return (
-        <Animated.FlatList
-            showsHorizontalScrollIndicator={false}
-            data={DUMMY_DATA}
-            keyExtractor={(item) => `${item.id}`}
-            horizontal
-            snapToInterval={width}
-            decelerationRate={0}
-            bounces={false}
-            scrollEventThrottle={16}
-            onScroll={Animated.event(
-                [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-                { useNativeDriver: true }
-            )}
-            contentContainerStyle={{
-                alignItems: "center"
-            }}
-            renderItem={({ item, index }) => (
-                <FlatListItem item={item} index={index} scrollX={scrollX} addToCart={addToCart} />
-            )}
-        />
+            <Animated.FlatList
+                showsHorizontalScrollIndicator={false}
+                data={DUMMY_DATA}
+                keyExtractor={(item) => `${item.id}`}
+                horizontal
+                snapToInterval={ITEM_SIZE}
+                decelerationRate="normal"
+                bounces={false}
+                scrollEventThrottle={16}
+                pagingEnabled
+                onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                    { useNativeDriver: true }
+                )}
+                contentContainerStyle={{
+                    alignItems: "center"
+                }}
+                renderItem={({ item, index }) => (
+                    <FlatListItem item={item} index={index} scrollX={scrollX} 
+                        addToCart={addToCart} removeFromCart={removeFromCart}
+                        qty={getQty(item)} />
+                )}
+            />
     );
 }
 

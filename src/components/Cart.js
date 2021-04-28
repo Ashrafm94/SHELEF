@@ -2,13 +2,19 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions, Image } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/Zocial';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DUMMY_DATA } from '../constants';
+import { emptyCart } from '../redux/actions/cart';
 const { width } = Dimensions.get("window");
 
 const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart }) => {
 
     const cart = useSelector(state => state.cartReducer.cart);
+    const dispatch = useDispatch();
+
+    const emptyCartList = () => {
+        dispatch(emptyCart());
+    }
 
     //Render Open Cart Component
     const ActionCart = () => {
@@ -22,14 +28,18 @@ const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart }) => {
                             <Text style={{ color: "white" }}>סגירה</Text>
                         </View>
                         <View><Text style={{ color: "white", fontSize: 16 }}>{cart.length || 0} פרטים</Text></View>
-                        <View></View>
+                        <TouchableOpacity onPress={() => emptyCartList()} style={{ justifyContent: "center", alignItems: "center" }}>
+                            <FontAwesome5 name="trash" size={20} color="white" />
+                            <Text style={{ color: "white" }}>מחיקה</Text>
+                        </TouchableOpacity>
                     </View>
                 </TouchableOpacity >
                 <ScrollView>
                     <View style={styles.itemsStyleContainer}>
                         {
-                            DUMMY_DATA.map((val, ind) => <View key={ind}>
+                            cart.map((val, ind) => <View key={ind}>
                                 <Image source={val.img} style={styles.smallImage} resizeMode="contain" />
+                                <Text style={{textAlign: "center"}}>{val.qty}</Text>
                             </View>)
                         }
                     </View>
