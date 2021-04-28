@@ -3,7 +3,7 @@ import {Animated } from 'react-native';
 import FlatListItem from './FlatListItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { DUMMY_DATA, ITEM_SIZE } from '../constants';
-import { addItem, emptyCart, modifyItem, removeItem } from '../redux/actions/cart';
+import { addItem, modifyItem, removeItem } from '../redux/actions/cart';
 
 const FlatListComponent = () => {
 
@@ -23,7 +23,7 @@ const FlatListComponent = () => {
 
         //Item Exist
         if (oldItem) {
-             modifyItem({
+            modifyItemInCart({
                 ...item,
                 qty: oldItem.qty + 1
             });
@@ -42,7 +42,7 @@ const FlatListComponent = () => {
 
         if (oldItem) {
             if (oldItem.qty > 1) {
-                modifyItem({
+                modifyItemInCart({
                     ...item,
                     qty: oldItem.qty - 1
                 });
@@ -53,7 +53,7 @@ const FlatListComponent = () => {
     }
 
     //Modify Item
-    const modifyItem = (item) => {
+    const modifyItemInCart = (item) => {
         dispatch(modifyItem(item));
     }
 
