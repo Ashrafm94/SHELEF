@@ -21,6 +21,3 @@ export const DUMMY_DATA = [
  {id: 14, img: img4, price: 13.2},
  {id: 15, img: img5, price: 12.5}
 ];
-
-export const IN_ACTIVE_ITEM_SIZE = 100;
-export const ACTIVE_ITEM_SIZE = 200;
