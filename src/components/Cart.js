@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions, Image } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions, Image, Animated } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/Zocial';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import { DUMMY_DATA } from '../constants';
 import { emptyCart } from '../redux/actions/cart';
 const { width } = Dimensions.get("window");
 
-const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart }) => {
+const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart, widthVal, navigateToChild }) => {
 
     const cart = useSelector(state => state.cartReducer.cart);
     const dispatch = useDispatch();
@@ -18,9 +18,11 @@ const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart }) => {
 
     //Render Open Cart Component
     const ActionCart = () => {
+        
         return (
             <View>
-                <TouchableOpacity style={styles.openCartHeader}
+                <TouchableOpacity 
+                    style={{paddingVertical: 10, paddingHorizontal: 20}}
                     onPress={() => changeLayoutHeightAndToggleCart()}>
                     <View style={styles.openCartContainer}>
                         <View style={{ justifyContent: "center", alignItems: "center" }}>
@@ -34,16 +36,21 @@ const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart }) => {
                         </TouchableOpacity>
                     </View>
                 </TouchableOpacity >
-                <ScrollView>
-                    <View style={styles.itemsStyleContainer}>
-                        {
-                            cart.map((val, ind) => <View key={ind}>
-                                <Image source={val.img} style={styles.smallImage} resizeMode="contain" />
-                                <Text style={{textAlign: "center"}}>{val.qty}</Text>
-                            </View>)
-                        }
-                    </View>
-                </ScrollView>
+                <View
+                    style={{backgroundColor: "#f5f5f5"}}>
+                    <ScrollView>
+                        <View style={styles.itemsStyleContainer}>
+                            {
+                                cart.map((val, ind) => <TouchableOpacity key={ind}
+                                    activeOpacity={1}
+                                    onPress={() => navigateToChild(ind)}>
+                                    <Image source={val.img} style={styles.smallImage} resizeMode="contain" />
+                                    <Text style={{textAlign: "center"}}>{val.qty}</Text>
+                                </TouchableOpacity>)
+                            }
+                        </View>
+                    </ScrollView>
+                </View>
             </View>
         );
     }
@@ -51,26 +58,49 @@ const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart }) => {
     //Render Close Cart Component
     const ClosedCart = () => {
         return (
-            <TouchableOpacity onPress={() => changeLayoutHeightAndToggleCart()}
-                style={styles.cartClosedContainer}>
-                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                    <View style={{ width: 30, height: 30, margin: 5 }}>
-                        <Icon name="cart" size={30} color="white" />
-                        {
-                            (cart.length || 0 ) > 0 && 
-                            <View style={styles.cartBadge}>
-                                <Text style={{ color: "white" }}>{cart.length || 0}</Text>
-                            </View>
-                        }
+                <TouchableOpacity onPress={() => changeLayoutHeightAndToggleCart()}
+                    style={{}}>
+                    <View style={{ justifyContent: "center", alignItems: "center" }}>
+                        <View style={{ width: 30, height: 30, margin: 5 }}>
+                            <Icon name="cart" size={30} color="white" />
+                            {
+                                (cart.length || 0 ) > 0 && 
+                                <View style={styles.cartBadge}>
+                                    <Text style={{ color: "white" }}>{cart.length || 0}</Text>
+                                </View>
+                            }
 
+                        </View>
                     </View>
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+        );
+    }
+
+    const Header = () => {
+
+        const widthAnimation = widthVal.interpolate({
+            inputRange: [0, 1],
+            outputRange: [250, width]
+        })
+
+        const borderAnimation = widthVal.interpolate({
+            inputRange: [0, 1],
+            outputRange: [250, 0]
+        })
+
+        return (
+            <Animated.View
+                style={[styles.cartClosedContainer, 
+                {width: widthAnimation, borderTopLeftRadius: borderAnimation, borderTopRightRadius: borderAnimation}]}>
+                {isCartOpen ? 
+                    <ActionCart /> : <ClosedCart />
+                }
+            </Animated.View>
         );
     }
 
     return (
-        isCartOpen ? <ActionCart /> : <ClosedCart />
+        <Header />
     )
 }
 
@@ -85,8 +115,6 @@ const styles = StyleSheet.create({
         width: 250,
         borderTopLeftRadius: 250,
         borderTopRightRadius: 250,
-        borderWidth: 2,
-        borderColor: 'red'
     },
     openCartHeader: {
         width,
@@ -97,7 +125,7 @@ const styles = StyleSheet.create({
     openCartContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
     },
     itemsStyleContainer: {
         flexDirection: "row-reverse",

@@ -152,6 +152,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('release.keystore')
+            storePassword '123456'
+            keyAlias 'bliro'
+            keyPassword '123456'   
+        }
     }
     buildTypes {
         debug {

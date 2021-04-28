@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DUMMY_DATA, ITEM_SIZE } from '../constants';
 import { addItem, modifyItem, removeItem } from '../redux/actions/cart';
 
-const FlatListComponent = () => {
+const FlatListComponent = ({ setRef }) => {
 
     const scrollX = useRef(new Animated.Value(0)).current;
     const cart = useSelector(state => state.cartReducer.cart);
@@ -64,6 +64,7 @@ const FlatListComponent = () => {
 
     return (
             <Animated.FlatList
+                ref={(ref) => {setRef(ref)}}
                 showsHorizontalScrollIndicator={false}
                 data={DUMMY_DATA}
                 keyExtractor={(item) => `${item.id}`}

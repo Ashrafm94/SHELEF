@@ -1,37 +1,74 @@
 import React, { useRef, useState } from 'react';
-import { View, SafeAreaView, Animated, Easing } from 'react-native';
+import { View, SafeAreaView, Animated, Easing, Dimensions } from 'react-native';
 import Cart from '../components/Cart';
 import FlatListComponent from '../components/FlatListComponent';
 
-const CART_OPEN_FLEX = 2, CART_CLOSED_FLEX = 0.5, CART_SMALL_OPEN = 1;
-
+const {height} = Dimensions.get("window");
 
 const Home = () => {
 
     const [isCartOpen, setCartOpen] = useState(false);
-    const flexAnimatedVal = useRef(new Animated.Value(CART_CLOSED_FLEX)).current;
-    
+    const cartPosition = useRef(new Animated.ValueXY({x: 0, y: 40})).current;
+    const sectionPosition = useRef(new Animated.ValueXY({x: 0, y: height-50})).current;
+    const widthVal = useRef(new Animated.Value(0)).current;
+    const [flatRef, setFlatRef] = useState(null);
 
     const changeLayoutHeightAndToggleCart = () => {
 
-        let newVal = isCartOpen ? CART_CLOSED_FLEX : CART_OPEN_FLEX;
-        let timeOut = isCartOpen ? 501 : 1;
+        let newCarouselVal = isCartOpen ? 40 : 250;
+
+        animateWidth();
+        animateCartSection(newCarouselVal);
+        animateCarouselSection(newCarouselVal);
 
         setTimeout(() => {
-            setCartOpen(!isCartOpen);
-        }, timeOut);
+            setCartOpen(!isCartOpen);   
+        }, 700);
+    }
 
-        animateCartSection(newVal);
+    const animateWidth = () => {
+        Animated.timing(widthVal, {
+            toValue: isCartOpen ? 0 : 1,
+            duration: 400,
+            delay: 1000,
+            useNativeDriver: false
+        }).start()
     }
 
     const animateCartSection = (val) => {
-        Animated.timing(flexAnimatedVal, {
-            toValue: val,
+        // Animated.timing(cartFlex, {
+        //     toValue: val,
+        //     duration: 500,
+        //     useNativeDriver: false,
+        //     easing: Easing.linear,
+        //     delay: 50
+        // }).start();
+
+        Animated.timing(cartPosition, {
+            toValue: {x: 0, y: val},
             duration: 500,
             useNativeDriver: false,
-            easing: Easing.inOut(Easing.linear),
-            delay: 1
+            easing: Easing.linear,
+            delay: 100
         }).start();
+    }
+
+    const animateCarouselSection = (val) => {
+        Animated.timing(sectionPosition, {
+            toValue: {x: 0, y: height-val-50},
+            duration: 500,
+            useNativeDriver: false,
+            easing: Easing.linear,
+            delay: 100
+        }).start();
+    }
+
+    const navigateToChild = (ind) => {
+        flatRef.scrollToIndex({animated: true, index: ind})
+    }
+
+    const setRef = (ref) => {
+        setFlatRef(ref);
     }
 
     return (
@@ -39,16 +76,22 @@ const Home = () => {
             <View style={{ flex: 1 }}>
 
                 <Animated.View style={{
-                    flex: 3
+                    height: sectionPosition.y
                 }}>
-                    <FlatListComponent />
+                    <FlatListComponent setRef={setRef} />
                 </Animated.View>
                 <Animated.View style={{
-                    flex: flexAnimatedVal,
                     alignItems: "center",
-                    justifyContent: "flex-end"
+                    justifyContent: "flex-start",
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: cartPosition.y
                 }}>
-                    <Cart isCartOpen={isCartOpen} changeLayoutHeightAndToggleCart={changeLayoutHeightAndToggleCart} />
+                    <Cart isCartOpen={isCartOpen} 
+                        changeLayoutHeightAndToggleCart={changeLayoutHeightAndToggleCart}
+                        widthVal={widthVal} navigateToChild={navigateToChild} />
                 </Animated.View>
             </View>
         </SafeAreaView>
