@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Dimensions, View, Text, TouchableOpacity, Animated, Image, StyleSheet, PanResponder } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useSelector } from 'react-redux';
 import { ITEM_SIZE } from '../constants'
 
 const {width} = Dimensions.get("window");
@@ -58,8 +57,6 @@ const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty }) 
         outputRange: [100, 0, 100],
         extrapolate: "clamp"
     });
-
-    // transform: [{translateX}]
 
     return (
         <View style={{ width: ITEM_SIZE }}>
