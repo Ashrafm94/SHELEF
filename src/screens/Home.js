@@ -78,7 +78,7 @@ const Home = () => {
                 <Animated.View style={{
                     height: sectionPosition.y
                 }}>
-                    <FlatListComponent setRef={setRef} />
+                    <FlatListComponent setRef={setRef} navigateToChild={navigateToChild} />
                 </Animated.View>
                 <Animated.View style={{
                     alignItems: "center",
