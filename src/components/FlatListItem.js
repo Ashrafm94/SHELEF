@@ -3,33 +3,87 @@ import { View, Text, TouchableOpacity, Animated, StyleSheet, PanResponder } from
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { ITEM_SIZE } from '../constants'
 
-const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, len }) => {
+const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, len, changeLayoutHeightAndToggleCart }) => {
 
     const position = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
     const [isActionsPresent, setIsActionsPresent] = useState(true);
 
     const pan = PanResponder.create({
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderStart: () => {
-            setIsActionsPresent(false)
+        // onMoveShouldSetPanResponder: () => true,
+        // onPanResponderStart: () => {
+        //     setIsActionsPresent(false)
+        // },
+        // onPanResponderMove: (event, gestureState) => {
+        //     Animated.event([{dx: position.x, dy: position.y}], {
+        //         useNativeDriver: false
+        //     })({dx: gestureState.x0, dy: gestureState.y0})
+        // },
+        // // onPanResponderMove: Animated.event([
+        // //         null,
+        // //         {dx: position.x, dy: position.y },
+        // //     ], {useNativeDriver: false}),
+        // onPanResponderEnd: () => {
+        //     Animated.spring(position, {
+        //         toValue: {x: 0, y: 0},
+        //         useNativeDriver: false
+        //     }).start();
+        // },
+        // onPanResponderRelease: () => {
+        //     let yPos = position.y._value;
+            
+        //     if (yPos > 35) {
+        //         addToCart(item);
+        //         setIsActionsPresent(true);
+        //         changeLayoutHeightAndToggleCart(false);
+        //     }
+        // }
+        // Ask to be the responder:
+        onPanResponderStart: () => { setIsActionsPresent(false) },
+        onStartShouldSetPanResponder: (evt, gestureState) => true,
+        onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+        onMoveShouldSetPanResponder: (evt, gestureState) => {
+            if (gesture?.moveX > gesture?.moveY) {
+                return false;
+              }
+              return true;
+        },
+        onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+        onPanResponderGrant: (evt, gestureState) => {
+            // The gesture has started. Show visual feedback so the user knows
+            // what is happening!
+            // gestureState.d{x,y} will be set to zero now
         },
         onPanResponderMove: Animated.event([
-            null,
-            {dx: position.x, dy: position.y },
-        ], {useNativeDriver: false}),
-        onPanResponderEnd: () => {
+                null,
+                {dx: position.x, dy: position.y },
+            ], {useNativeDriver: false, listener: (event) => {
+                let yPos = position.y._value;
+                if (yPos > 35) {
+                    changeLayoutHeightAndToggleCart(false);
+                }
+            }}),
+        onPanResponderTerminationRequest: (evt, gestureState) => false,
+        onPanResponderRelease: (evt, gestureState) => {
             Animated.spring(position, {
                 toValue: {x: 0, y: 0},
                 useNativeDriver: false
             }).start();
-        },
-        onPanResponderRelease: () => {
+
             let yPos = position.y._value;
-            
             if (yPos > 35) {
                 addToCart(item);
                 setIsActionsPresent(true);
+                changeLayoutHeightAndToggleCart(false);
             }
+        },
+        onPanResponderTerminate: (evt, gestureState) => {
+            // Another component has become the responder, so this gesture
+            // should be cancelled
+        },
+        onShouldBlockNativeResponder: (evt, gestureState) => {
+            // Returns whether this component should block native components from becoming the JS
+            // responder. Returns true by default. Is currently only supported on android.
+            return true;
         }
     })
 
@@ -46,7 +100,7 @@ const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, le
 
     const opacity = scrollX.interpolate({
         inputRange,
-        outputRange: [0.5, 1, 0.5],
+        outputRange: [0.3, 1, 0.4],
         extrapolate: "clamp"
     });
 
@@ -64,8 +118,10 @@ const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, le
 
     const translateX = scrollX.interpolate({
         inputRange,
-        outputRange: [30, 0, 0]
+        //outputRange: [30, 0, 0]
+        outputRange: [0, 0, 0]
     })
+
 
     return (
         <Fragment>
@@ -75,11 +131,11 @@ const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, le
             }
 
             <View style={{ width: ITEM_SIZE }}>
-
-                <Animated.View style={[styles.itemContainer, {opacity: priceOpacity}]}>
+                
+                {/* <Animated.View style={[styles.itemContainer, {opacity: priceOpacity}]}>
                     <Text style={styles.price}>מחיר מבצע</Text>
                     <Text style={styles.price}>{`${item.price} ₪`}</Text>
-                </Animated.View>
+                </Animated.View> */}
 
                 <Animated.View
                     {...pan.panHandlers}
