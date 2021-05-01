@@ -63,8 +63,13 @@ const Home = () => {
         }).start();
     }
 
-    const navigateToChild = (ind) => {
-        flatRef.scrollToIndex({animated: true, index: ind})
+    const navigateToChild = (id) => {
+        //In Our case the id represnt index+1
+        //So the item will be in "id - 1"
+        //And Because we adding new item before the first element
+        //so we need to subtract another item in order to get to the attached item
+        let index = id - 2;
+        flatRef.scrollToIndex({animated: true, index})
     }
 
     const setRef = (ref) => {
@@ -78,7 +83,7 @@ const Home = () => {
                 <Animated.View style={{
                     height: sectionPosition.y
                 }}>
-                    <FlatListComponent setRef={setRef} navigateToChild={navigateToChild} />
+                    <FlatListComponent setRef={setRef} />
                 </Animated.View>
                 <Animated.View style={{
                     alignItems: "center",

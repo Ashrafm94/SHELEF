@@ -43,7 +43,7 @@ const Cart = ({ isCartOpen, changeLayoutHeightAndToggleCart, widthVal, navigateT
                             {
                                 cart.map((val, ind) => <TouchableOpacity key={ind}
                                     activeOpacity={1}
-                                    onPress={() => navigateToChild(ind)}>
+                                    onPress={() => navigateToChild(val.id)}>
                                     <Image source={val.img} style={styles.smallImage} resizeMode="contain" />
                                     <Text style={{textAlign: "center"}}>{val.qty}</Text>
                                 </TouchableOpacity>)

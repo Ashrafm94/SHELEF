@@ -1,11 +1,9 @@
 import React, { Fragment, useRef, useState } from 'react';
-import { Dimensions, View, Text, TouchableOpacity, Animated, Image, StyleSheet, PanResponder } from 'react-native';
+import { View, Text, TouchableOpacity, Animated, StyleSheet, PanResponder } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { ITEM_SIZE } from '../constants'
 
-const {width} = Dimensions.get("window");
-
-const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, len, navigateToChild }) => {
+const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, len }) => {
 
     const position = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
     const [isActionsPresent, setIsActionsPresent] = useState(true);
@@ -14,7 +12,6 @@ const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, le
         onMoveShouldSetPanResponder: () => true,
         onPanResponderStart: () => {
             setIsActionsPresent(false)
-            console.log("index: ", index)
         },
         onPanResponderMove: Animated.event([
             null,
@@ -65,6 +62,11 @@ const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, le
         extrapolate: "clamp"
     });
 
+    const translateX = scrollX.interpolate({
+        inputRange,
+        outputRange: [30, 0, 0]
+    })
+
     return (
         <Fragment>
 
@@ -90,8 +92,8 @@ const FlatListItem = ({ scrollX, item, index, addToCart, removeFromCart, qty, le
                     <TouchableOpacity onPress={() => addToCart(item)} activeOpacity={1}
                         >
                         <Animated.View
-                            style={[styles.container, { opacity }]}>
-                            <View style={styles.imgContainer}>
+                            style={[styles.container, { opacity, transform: [{translateX}] }]}>
+                            <View style={styles.imgContainer, {}}>
                                 <Animated.Image source={item.img} style={[styles.img, {
                                     transform: [
                                         {scale},
